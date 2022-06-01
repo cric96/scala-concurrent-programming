@@ -1,8 +1,9 @@
 package it.unibo.effect
 
+import cats.effect.ExitCode
 import com.sun.source.tree.ContinueTree
 import monix.catnap.Semaphore
-import monix.eval.Task
+import monix.eval.{Task, TaskApp}
 import monix.execution.Scheduler
 import monix.execution.Scheduler.Implicits.global
 
@@ -18,6 +19,9 @@ import scala.util.Random // Global monix context
   * Similar to IO (cats) https://typelevel.org/cats-effect/docs/2.x/datatypes/io but with steroid
   */
 
+// Example of "end-of-the-world"
+object EndOfTheWorld extends TaskApp:
+  def run(args: List[String]): Task[ExitCode] = Task(10).map(_ => ExitCode.Success)
 @main def basics(): Unit =
   /** Tasks are lazy, i.e., they **express** effects => the same computation can be evaluated multiple time */
   val task = Task {
