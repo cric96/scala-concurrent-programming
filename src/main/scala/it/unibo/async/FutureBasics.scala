@@ -24,6 +24,13 @@ import scala.util.{Failure, Success} // Another way to put in context the execut
   }
   Thread.sleep(500)
 
+@main def callBack: Unit =
+  Future(10)
+    .onComplete {
+      case Success(value) => println(s"Hurra! $value")
+      case Failure(exception) => println("Oh no..")
+    }
+  Thread.sleep(500)
 /** I can update value computed concurrently using map & flatMap & filter */
 @main def futureManipulation: Unit =
   val build = Future(Source.fromFile("build.sbt")) // Concurrent program expressed as sequence of map
@@ -34,7 +41,7 @@ import scala.util.{Failure, Success} // Another way to put in context the execut
     .map(source => source.getLines())
     .map(lines => lines.mkString("\n"))
 
-  // NB! scalafmt and build are concurrent hare..
+  // NB! scalafmt and build are concurrent here..
   val combine = build.flatMap(data => scalafmt.map(other => data + other)) // Concurrent Program can be composed
 
   combine.onComplete { // To handle the result, you can use "on complete"
@@ -114,7 +121,7 @@ def storeImage(name: String, image: BufferedImage): Future[Unit] = Future(ImageI
     println("error..")
   }
   Await.ready(failed, Duration.Inf)
-  val fail = Future(1).failed // create a future that complete if the future fail
+  val fail = Future(1).failed // create a future that completes if the future fails
   fail.foreach(println)
   Await.ready(fail, Duration.Inf)
   val empty = Future(1).filter(_ => false)

@@ -9,3 +9,13 @@ class Blinker(times: Int) extends Thread:
   thread.start() // starts the thread...
   val oopThread = Blinker(10)
   oopThread.start()
+
+@main def join: Unit =
+  val blinkerA = Blinker(10)
+  val blinkerB = Blinker(10)
+  println("Start A")
+  blinkerA.start()
+  blinkerA.join()
+  println("Start B")
+  blinkerB.start()
+  blinkerB.join()

@@ -172,12 +172,7 @@ import scala.util.Random // Global monix context
     number <- toGuess
     user <- parse
     state <-
-      if (user < number)
-        toLow
-      else if (user > number)
-        toHigh
-      else
-        correct
+      if (user < number) toLow else if (user > number) toHigh else correct
   } yield state
 
   val futureGame = game.restartUntil(_ != State.Continue).runToFuture

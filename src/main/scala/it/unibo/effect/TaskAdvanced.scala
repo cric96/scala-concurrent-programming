@@ -40,8 +40,7 @@ import scala.util.Random
   } yield ()
 
   def producer(data: MVar[Task, Int]) = for {
-    _ <- Task(println("Try put"))
-    result <- data.put(Random.nextInt())
+    result <- Task(println("Try put")) >> data.put(Random.nextInt())
     _ <- Task.sleep(Random.between(100, 200) milliseconds)
   } yield ()
 

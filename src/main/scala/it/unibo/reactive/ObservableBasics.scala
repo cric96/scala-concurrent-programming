@@ -39,7 +39,7 @@ import scala.language.postfixOps
   val delay = Observable.delay { println("hey"); 10 } // hey is printed each time the observable is consumed
   delay.foreach(println)
   delay.foreach(println)
-  val lazyObservable = Observable.evalOnce { println("hey"); 10 } // hey is printed one, then the value is memoized
+  val lazyObservable = Observable.evalOnce { println("hey"); 10 } // hey is printed once, then the value is memoized
   lazyObservable.foreach(println)
   lazyObservable.foreach(println)
   val sideEffects = Observable.suspend {
