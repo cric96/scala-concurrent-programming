@@ -27,7 +27,7 @@ import scala.util.{Failure, Success} // Another way to put in context the execut
 @main def callBack: Unit =
   Future(10)
     .onComplete {
-      case Success(value) => println(s"Hurra! $value")
+      case Success(value) => println(s"Hurray! $value")
       case Failure(exception) => println("Oh no..")
     }
   Thread.sleep(500)
@@ -65,7 +65,7 @@ import scala.util.{Failure, Success} // Another way to put in context the execut
   val concurrentManipulation = for {
     buildSbt <- readFile("build.sbt")
     scalafmt <- readFile(".scalafmt.conf") // NB! build this two future are sequential
-    fileSbt = extractLines(buildSbt) // I can you the data inside a Future manipulation..
+    fileSbt = extractLines(buildSbt) // I can map the "lazy" data inside a Future "for-comprehension"..
     fileFmt = extractLines(scalafmt)
   } yield (fileFmt + fileSbt)
 
