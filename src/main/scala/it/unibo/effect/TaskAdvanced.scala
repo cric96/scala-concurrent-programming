@@ -12,7 +12,7 @@ import scala.util.Random
 
 @main def synchronization(): Unit =
   val semaphore = Semaphore[Task](1)
-  // Just an example, in effect you should not use vars... Consider shared resources...
+  // Just an example, in fact you should not use vars... Consider shared resources...
   var shared = 0
   def effect: Task[Unit] = Task {
     shared += 1

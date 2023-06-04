@@ -1,6 +1,6 @@
 package it.unibo.executors
 
-import java.util.concurrent.CountDownLatch
+import java.util.concurrent.{CountDownLatch, Executors}
 import scala.concurrent.{ExecutionContext, blocking}
 
 // In scala, a natural way to "enrich" the language consist in using contexts + entrypoints. async is the entrypoint of the dsl, ExecutionContext is the context
@@ -19,16 +19,18 @@ def async(any: => Unit)(using ExecutionContext): Unit =
   val bigNumber = 20
   val latch = CountDownLatch(20)
   println("Hello!!")
-  given ExecutionContext = ExecutionContext.global
+  given ExecutionContext =
+    ExecutionContext.global //ExecutionContext.fromExecutorService(Executors.newCachedThreadPool())
   (1 to bigNumber) foreach { i =>
     async {
-      //blocking {
-      latch.countDown()
-      println(s"I am in: ${Thread.currentThread().getName}" + i)
-      latch.await()
-      //}
+      blocking {
+        latch.countDown()
+        println(s"I am in: ${Thread.currentThread().getName} -- " + i)
+        latch.await()
+      }
     }
   }
   // Block!!
-  latch.await()
   async(latch.countDown())
+  latch.await()
+  println("Over..")

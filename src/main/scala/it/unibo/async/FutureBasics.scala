@@ -1,7 +1,7 @@
 package it.unibo.async
 import java.awt.image.BufferedImage
 import java.io.File
-import java.net.URL
+import java.net.{URI, URL}
 import java.nio.file.{Files, Paths}
 import java.util.concurrent.{CountDownLatch, Executors}
 import javax.imageio.ImageIO
@@ -24,7 +24,7 @@ import scala.util.{Failure, Success} // Another way to put in context the execut
   }
   Thread.sleep(500)
 
-@main def callBack: Unit =
+@main def callback: Unit =
   Future(10)
     .onComplete {
       case Success(value) => println(s"Hurray! $value")
@@ -83,14 +83,14 @@ import scala.util.{Failure, Success} // Another way to put in context the execut
 
   Thread.sleep(1000)
 
-def getImage(url: String): Future[BufferedImage] = Future(ImageIO.read(URL(url)))
+def getImage(url: String): Future[BufferedImage] = Future(ImageIO.read(URI.create(url).toURL))
 def storeImage(name: String, image: BufferedImage): Future[Unit] = Future(ImageIO.write(image, "jpg", File(name)))
 
 // Future can be used for IO management (in general to manage data flow)
 @main def ioManagement: Unit =
   val result = for {
-    cats <- getImage("https://thiscatdoesnotexist.com/")
-    _ <- storeImage("cat.jpg", cats)
+    person <- getImage("https://thispersondoesnotexist.com/")
+    _ <- storeImage("person.jpg", person)
   } yield ()
   Await.result(result, Duration.Inf)
 
@@ -107,10 +107,10 @@ def storeImage(name: String, image: BufferedImage): Future[Unit] = Future(ImageI
 // Something happen that you have a sequence of Future and you want way the end of all of them.
 // In this case, You have to convert List[Future[_]] into a Future[List[_]]...
 @main def sequence: Unit =
-  Files.createDirectories(Paths.get("./kittens"))
+  Files.createDirectories(Paths.get("./people"))
   val requests = (0 to 10)
-    .map(i => (i, getImage("https://thiscatdoesnotexist.com/")))
-    .map { case (i, cats) => cats.flatMap(storeImage(s"./kittens/$i.jpg", _)) }
+    .map(i => (i, getImage("https://thispersondoesnotexist.com/")))
+    .map { case (i, people) => people.flatMap(storeImage(s"./people/$i.jpg", _)) }
   val allImages = Future.sequence(requests)
   Await.result(allImages, Duration.Inf)
 

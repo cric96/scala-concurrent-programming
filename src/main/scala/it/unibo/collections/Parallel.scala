@@ -36,9 +36,9 @@ def measure[L](any: => L): Long =
   */
 @main def reduceProblems: Unit =
   println((1 to 100).fold(0)(_ - _))
-  println((1 to 100).par.fold(0)(_ - _)) // Arg!!
+  println((1 to 100).par.fold(0)(_ - _)) // KO !!!
   var counter = 0
   (1 to 100) foreach { _ => counter += 1 }
   assert(counter == 100) // OK!!
   (1 to 100).par.foreach(_ => counter += 1)
-  assert(counter == 200) // Arg!!!
+  assert(counter == 200) // KO!!!
