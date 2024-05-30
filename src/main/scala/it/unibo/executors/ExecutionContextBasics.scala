@@ -12,6 +12,6 @@ def sayGreet()(using context: ExecutionContext): Unit =
   context.execute(() => println("Task done!"))
   val fromExecutors = ExecutionContext.fromExecutor(Executors.newSingleThreadExecutor())
   fromExecutors.execute(() => println("Java wrapper"))
-  //sayGreet() // error
+  // sayGreet() // error
   given ExecutionContext = fromExecutors // enrich the context
   sayGreet()

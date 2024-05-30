@@ -11,7 +11,7 @@ def measure[L](any: => L): Long =
   // Api to express time
   val duration = (System.nanoTime() - before) nanos
 
-  (duration.toMillis)
+  duration.toMillis
 @main def parallelPlain: Unit =
   val bigList = (0 to 1e7.toInt) map (_ + 1)
   val time = measure(bigList.map(_ * 2).fold(0)(_ + _))

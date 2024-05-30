@@ -24,23 +24,24 @@ object EndOfTheWorld extends TaskApp:
   def run(args: List[String]): Task[ExitCode] = Task(10).map(_ => ExitCode.Success)
 @main def basics(): Unit =
   /** Tasks are lazy, i.e., they **express** effects => the same computation can be evaluated multiple time */
-  val task = Task {
-    println(Thread.currentThread().getName)
-    1 + 1
-  }
+  val task = Task:
+      println(Thread.currentThread().getName)
+      1 + 1
+
   Thread.sleep(1000)
   task.runSyncUnsafe() // Differently from Future, I should explicitly run Tasks
-  task.runAsync { // Either expresses a data that could be of two type
-    case Right(ok) => println(ok)
-    case Left(ko) => println(ko)
-  }
+  task.runAsync: // Either expresses a data that could be of two type
+      case Right(ok) => println(ok)
+      case Left(ko) => println(ko)
+
   task.runToFuture.foreach(println) // Future can be used as a mechanism to run tasks
 
 @main def cancelComputation(): Unit =
   val execution = Task(true).delayExecution(1 seconds)
-  val future = execution.runAsync { case any =>
-    println(any)
-  }
+  val future = execution.runAsync:
+      case any =>
+        println(any)
+
   Thread.sleep(500)
   future.cancel() // nothing happen, the task is not executed
   execution.foreach(println) // i can use foreach to for the task executed
@@ -57,15 +58,14 @@ object EndOfTheWorld extends TaskApp:
   } // it evaluates the value asap and wraps it inside the task
   now.foreach(println)
   now.foreach(println)
-  //Task.apply =:= Task.eval
+  // Task.apply =:= Task.eval
   val standard = Task(Math.random()) // lazy.. the evaluation happen when the task is created
   standard.foreach(println)
   standard.foreach(println)
   // Similar to a lazy val, the value it is evaluated once and then memoized (like future)
-  val once = Task.evalOnce {
-    println("Here")
-    Math.random()
-  }
+  val once = Task.evalOnce:
+      println("Here")
+      Math.random()
   Thread.sleep(500)
   once.foreach(println)
   once.foreach(println)
@@ -84,12 +84,13 @@ object EndOfTheWorld extends TaskApp:
   async.foreach(nothing) // force to run into another thread
   foo.executeOn(io).foreach(nothing)
   // multi executors
-  val combine = for {
+  val combine = for
     _ <- foo
     _ <- async
     _ <- fork
-  } yield ()
+  yield ()
   combine.foreach(nothing)
+
 /** unless you’re doing blocking I/O, keep using the default thread-pool, with global being a good default. For blocking
   * I/O it is OK to have a second thread-pool, but isolate those I/O operations and only override the scheduler for
   * actual I/O operations.
@@ -108,10 +109,10 @@ object EndOfTheWorld extends TaskApp:
   val file = Task(Source.fromFile("build.sbt"))
   def linesFromSource(source: Source): Task[List[String]] = Task(source.getLines().toList)
   // Sequence evaluation
-  val result = for {
+  val result = for
     build <- file
     lines <- linesFromSource(build)
-  } yield lines.mkString("\n")
+  yield lines.mkString("\n")
 
   result.foreach(println)
   Thread.sleep(1000)
@@ -135,7 +136,7 @@ object EndOfTheWorld extends TaskApp:
   Task
     .parSequence(wait :: wait :: wait :: Nil)
     .foreach(_ => println("parallel.."))
-  //.runAsync // Parallel computation
+  // .runAsync // Parallel computation
   Thread.sleep(5000)
 
 @main def exceptionHandling: Unit =
@@ -171,13 +172,13 @@ object EndOfTheWorld extends TaskApp:
   val correct = Task(println("You won!!")).map(_ => State.End)
 
   // The main, a typical way to express IO in functional program, through flatmap operations..
-  val game = for {
+  val game = for
     _ <- hello
     number <- toGuess
     user <- parse
     state <-
       if (user < number) toLow else if (user > number) toHigh else correct
-  } yield state
+  yield state
 
   val futureGame = game.restartUntil(_ != State.Continue).runToFuture
   println(Await.result(futureGame, Duration.Inf))

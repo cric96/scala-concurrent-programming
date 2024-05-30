@@ -2,6 +2,7 @@ package it.unibo.async
 
 import scala.concurrent.Promise
 import concurrent.ExecutionContext.Implicits.global
+
 /** A promise and a future represent two aspects of a single–assignment variable–the promise allows you to assign a
   * value to the future object, whereas the future allows you to read that value.
   *

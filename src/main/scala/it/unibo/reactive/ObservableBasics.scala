@@ -42,10 +42,9 @@ import scala.language.postfixOps
   val lazyObservable = Observable.evalOnce { println("hey"); 10 } // hey is printed once, then the value is memoized
   lazyObservable.foreach(println)
   lazyObservable.foreach(println)
-  val sideEffects = Observable.suspend {
-    val effect = Source.fromFile("build.sbt")
-    Observable.fromIterator(Task(effect.getLines()))
-  }
+  val sideEffects = Observable.suspend:
+      val effect = Source.fromFile("build.sbt")
+      Observable.fromIterator(Task(effect.getLines()))
   sideEffects.foreach(println)
   Thread.sleep(500)
 
@@ -57,10 +56,10 @@ import scala.language.postfixOps
   frame.pack()
   frame.setVisible(true)
   // Using create api
-  val buttonObservable = Observable.create[Long](OverflowStrategy.Unbounded) { subject =>
-    button.addActionListener((e: ActionEvent) => subject.onNext(e.getWhen))
-    Cancelable.empty
-  }
+  val buttonObservable = Observable.create[Long](OverflowStrategy.Unbounded): subject =>
+      button.addActionListener((e: ActionEvent) => subject.onNext(e.getWhen))
+      Cancelable.empty
+
   // Or through subjects (i.e., tuple of observer and observable)
   val subject = ConcurrentSubject[Long](MulticastStrategy.replay)
   button.addActionListener((e: ActionEvent) => subject.onNext(e.getWhen))
@@ -71,10 +70,10 @@ import scala.language.postfixOps
 @main def composition: Unit =
   val stepper = Observable.fromIterable(LazyList.continually(10)).delayOnNext(500 milliseconds)
   val greeter = Observable.repeatEval("Hello!!").delayOnNext(100 milliseconds)
-  val combined = for { // I can combine observable like list, option,....
+  val combined = for // I can combine observable like list, option,....
     number <- stepper
     greet <- greeter
-  } yield (number, greet)
+  yield (number, greet)
   combined.foreach(println(_))
   Thread.sleep(1000)
 
@@ -109,7 +108,7 @@ import scala.language.postfixOps
 
 // Buffer operations https://monix.io/docs/current/reactive/observable.html#processing-elements-in-batches
 @main def buffers: Unit =
-  val base = Observable.fromIterable((0 to 10)).delayOnNext(100 milliseconds)
+  val base = Observable.fromIterable(0 to 10).delayOnNext(100 milliseconds)
   base
     .bufferSliding(2, 1)
     .foreachL(println(_))
@@ -128,7 +127,7 @@ import scala.language.postfixOps
 // Manage "source" using time abstraction https://monix.io/docs/current/reactive/observable.html#limiting-the-rate-of-emission-of-elements
 // Useful => slow down inputs
 @main def rateEmission: Unit =
-  val base = Observable.fromIterable((0 to 10))
+  val base = Observable.fromIterable(0 to 10)
   println("Throttle")
   base.throttle(100 milliseconds, 1).foreachL(println).runSyncUnsafe()
   println("Throttle first")
@@ -139,7 +138,7 @@ import scala.language.postfixOps
 
 // Parallel execution, like par in scala collection
 @main def parallel: Unit =
-  val element = Observable.fromIterable((0 to 10))
+  val element = Observable.fromIterable(0 to 10)
   val parallelMap = element.mapParallelOrdered(8)(elem =>
     Task(elem * 5).tapEval(id => Task(println(id + " " + Thread.currentThread().getName)))
   )

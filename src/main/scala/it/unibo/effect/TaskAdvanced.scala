@@ -14,16 +14,15 @@ import scala.util.Random
   val semaphore = Semaphore[Task](1)
   // Just an example, in fact you should not use vars... Consider shared resources...
   var shared = 0
-  def effect: Task[Unit] = Task {
-    shared += 1
-    println(Thread.currentThread().getName)
-  }
+  def effect: Task[Unit] = Task:
+      shared += 1
+      println(Thread.currentThread().getName)
 
-  val syncComputation = for {
+  val syncComputation = for
     synch <- semaphore
     tasks = (1 to 1000).map(_ => synch.withPermit(effect))
     par <- Task.parSequence(tasks)
-  } yield par
+  yield par
 
   syncComputation.runSyncUnsafe()
   assert(shared == 1000)
@@ -31,27 +30,26 @@ import scala.util.Random
 @main def sharedVar(): Unit =
   val myVariable = MVar[Task].empty[Int]()
 
-  def consumer(name: String, data: MVar[Task, Int]) = for {
+  def consumer(name: String, data: MVar[Task, Int]) = for
     _ <- Task(println(s"Try take $name"))
     content <- data.take
-    _ <- Task {
-      println(s"New data! $content")
-    }
+    _ <- Task:
+        println(s"New data! $content")
     _ <- Task.sleep(Random.between(100, 200) milliseconds)
-  } yield ()
+  yield ()
 
-  def producer(data: MVar[Task, Int]) = for {
+  def producer(data: MVar[Task, Int]) = for
     result <- Task(println("Try put")) >> data.put(Random.nextInt())
     _ <- Task.sleep(Random.between(100, 200) milliseconds)
-  } yield ()
+  yield ()
 
-  val execution = for {
+  val execution = for
     data <- myVariable
     _ <- Task.parZip3(
       consumer("gianluca", data).loopForever,
       consumer("bibo", data).loopForever,
       producer(data).loopForever
     )
-  } yield ()
+  yield ()
 
   Await.ready(execution.runToFuture, Duration.Inf)

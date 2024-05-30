@@ -1,10 +1,10 @@
 package it.unibo.async
 
+import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.atomic.AtomicReference
-import java.util.concurrent.{ConcurrentLinkedQueue, LinkedBlockingDeque, LinkedBlockingQueue}
-import scala.concurrent.{Await, Future, Promise}
-import concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future, Promise}
 
 trait DataMagnet:
   type A
@@ -34,7 +34,7 @@ class EventLoopWithContinuation:
     ).start()
 
   def destroy(): Unit =
-    events.offer(DataMagnet.wrap((), Promise())) // process the last evetn
+    events.offer(DataMagnet.wrap((), Promise())) // process the last event
     executed.set(false)
 
 @main def testEventLoop(): Unit =
